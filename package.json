@@ -1,0 +1,11 @@
+{
+  "name": "submod",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/z4yross/submod.git",
+  "author": "z4yross",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^14.11.0"
+  }
+}
