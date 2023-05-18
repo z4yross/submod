@@ -1,4 +1,4 @@
-FROM arm64v8/node:current-alpine
+FROM node:current-alpine as node
 
 WORKDIR /app
 COPY package*.json ./
