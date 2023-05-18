@@ -16,6 +16,7 @@ jobs:
       env:
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_TARGET_PLATFORM: linux/arm/v8
       run: |
         docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
 
