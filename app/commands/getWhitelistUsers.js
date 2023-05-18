@@ -6,8 +6,12 @@ export default {
         .setName('getwhitelistusers')
         .setDescription('Gets the list of users on the whitelist.'),
     async execute(interaction) {
-        const users = await exaroton.getWhitelistUsers();
-        const usersString = users.join('\n');
-        await interaction.reply(`Users on the whitelist:\n${usersString}`);
+        try {
+            const users = await exaroton.getWhitelistUsers();
+            const usersString = users.join('\n');
+            await interaction.reply(`Users on the whitelist:\n${usersString}`);
+        } catch (error) {
+            await interaction.reply(`An error occurred: ${error}`);
+        }
     },
 };

@@ -1,13 +1,16 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 import { Client, Events, GatewayIntentBits, Collection, REST, Routes } from 'discord.js';
-import tokenConfig from './config.json' assert { type: "json" };
 
 import * as exaroton from './exaroton/manageUserLists.js';
 
 import * as Messages from './messages/messages.js';
+
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -42,7 +45,7 @@ for (const file of commandFiles) {
     }
 }
 
-const rest = new REST().setToken(tokenConfig.token);
+const rest = new REST().setToken(process.env.TOKEN);
 
 (async () => {
     try {
@@ -50,7 +53,7 @@ const rest = new REST().setToken(tokenConfig.token);
 
         // The put method is used to fully refresh all commands in the guild with the current set
         const data = await rest.put(
-            Routes.applicationGuildCommands(tokenConfig.clientId, tokenConfig.guildId),
+            Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
             { body: client.commands.map(command => command.data.toJSON()) },
         );
 
@@ -61,14 +64,36 @@ const rest = new REST().setToken(tokenConfig.token);
     }
 })();
 
+client.on(Events.InteractionCreate, async interaction => {
+	if (!interaction.isChatInputCommand()) return;
+
+	const command = interaction.client.commands.get(interaction.commandName);
+
+	if (!command) {
+		console.error(`No command matching ${interaction.commandName} was found.`);
+		return;
+	}
+
+	try {
+		await command.execute(interaction);
+	} catch (error) {
+		console.error(error);
+		if (interaction.replied || interaction.deferred) {
+			await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+		} else {
+			await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+		}
+	}
+});
+
 client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
     const oldMemberRoles = oldMember.roles.cache.map(role => role.name);
     const newMemberRoles = newMember.roles.cache.map(role => role.name);
 
     const newMemberNickname = newMember.nickname;
 
-    if (!oldMemberRoles.includes(tokenConfig.role) && !newMemberRoles.includes(tokenConfig.role)) return;
-    if (oldMemberRoles.includes(tokenConfig.role) && newMemberRoles.includes(tokenConfig.role)) return;
+    if (!oldMemberRoles.includes(process.env.ROLE) && !newMemberRoles.includes(process.env.ROLE)) return;
+    if (oldMemberRoles.includes(process.env.ROLE) && newMemberRoles.includes(process.env.ROLE)) return;
 
     if (newMemberNickname === null) {
         const message = Messages.warning(`**submod log warning**: ***${newMember.user.username}*** does not have a nickname, are you sure you want to add them to the whitelist?`);
@@ -80,7 +105,7 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
 
     const userNameToAdd = newMemberNickname === null ? newMember.user.username : newMemberNickname;
 
-    if (newMemberRoles.includes(tokenConfig.role) && !oldMemberRoles.includes(tokenConfig.role)) {
+    if (newMemberRoles.includes(process.env.ROLE) && !oldMemberRoles.includes(process.env.ROLE)) {
         const modlogChannel = newMember.guild.channels.cache.find(channel => channel.name === 'modlog');
         if (modlogChannel) {
             let message = Messages.success(`**submod log**:*** ${userNameToAdd}*** added to whitelist.`);
@@ -93,7 +118,7 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
 
             modlogChannel.send(message);
         }
-    } else if (!newMemberRoles.includes(tokenConfig.role) && oldMemberRoles.includes(tokenConfig.role)) {
+    } else if (!newMemberRoles.includes(process.env.ROLE) && oldMemberRoles.includes(process.env.ROLE)) {
         const modlogChannel = newMember.guild.channels.cache.find(channel => channel.name === 'modlog');
         if (modlogChannel) {
             let message = Messages.success(`**submod log**: ***${userNameToAdd}*** removed from whitelist.`);
@@ -114,4 +139,4 @@ client.once(Events.ClientReady, c => {
 });
 
 // Log in to Discord with your client's token
-client.login(tokenConfig.token);
+client.login(process.env.TOKEN);

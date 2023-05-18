@@ -1,5 +1,4 @@
 import exaroton from 'exaroton';
-import tokenConfig from '../config.json' assert { type: "json" };
 
 export class ExarotonClient{
     static instance = null;
@@ -7,12 +6,12 @@ export class ExarotonClient{
     client = null;
 
     constructor(){
-        this.server = tokenConfig.exoratonServer;
+        this.server = process.env.EXAROTON_SERVER;
     }
 
     async connect(){
         try{
-            this.client = new exaroton.Client(tokenConfig.exoratonToken);
+            this.client = new exaroton.Client(process.env.EXAROTON_TOKEN);
         } catch(e){
             console.log('Error while connecting to Exaroton API, retrying in 5 seconds...')
             await new Promise(resolve => setTimeout(resolve, 5000));
