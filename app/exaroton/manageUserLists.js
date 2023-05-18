@@ -52,7 +52,11 @@ export async function getAllServers() {
     const client = (await ExarotonClient.getInstance()).client;
     const servers = await client.getServers();
 
-    for (const server of servers) {
-        console.log(server.name, server.id);
-    }
+    const serverNames = servers.map(server => `${server.name} (${server.id})`).join('\n');
+    return serverNames;
+}
+
+export async function setClientServer(serverid) {
+    const exaroton = await ExarotonClient.getInstance();
+    exaroton.server = serverid;
 }

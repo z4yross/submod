@@ -1,11 +1,13 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
+import { PermissionFlagsBits } from 'discord.js';
 
 export default {
     data: new SlashCommandBuilder()
         .setName('setdiscordnickname')
         .setDescription('Sets the nickname of the user in the Discord server to the Minecraft username.')
         .addUserOption(option => option.setName('user').setDescription('The user to set the nickname of.').setRequired(true))
-        .addStringOption(option => option.setName('nickname').setDescription('The nickname to set.').setRequired(true)),
+        .addStringOption(option => option.setName('nickname').setDescription('The nickname to set.').setRequired(true))
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
     async execute(interaction) {
         const user = interaction.options.getUser('user');
         const nickname = interaction.options.getString('nickname');

@@ -1,11 +1,13 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import * as exaroton from '../exaroton/manageUserLists.js';
+import { PermissionFlagsBits } from 'discord.js';
 
 export default {
     data: new SlashCommandBuilder()
         .setName('delusertowhitelist')
         .setDescription('Manually removes a user from the whitelist.')
-        .addStringOption(option => option.setName('nickname').setDescription('The user to remove from the whitelist.').setRequired(true)),
+        .addStringOption(option => option.setName('nickname').setDescription('The user to remove from the whitelist.').setRequired(true))
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
     async execute(interaction) {
         const nickname = interaction.options.getString('nickname');
 

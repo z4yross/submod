@@ -1,10 +1,12 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import * as exaroton from '../exaroton/manageUserLists.js';
+import { PermissionFlagsBits } from 'discord.js';
 
 export default {
     data: new SlashCommandBuilder()
         .setName('getwhitelistusers')
-        .setDescription('Gets the list of users on the whitelist.'),
+        .setDescription('Gets the list of users on the whitelist.')
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
     async execute(interaction) {
         try {
             const users = await exaroton.getWhitelistUsers();
